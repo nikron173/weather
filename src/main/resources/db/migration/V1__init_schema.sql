@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id bigserial primary key,
     login text not null,
+    email text not null,
     password text not null
 );
 
@@ -26,8 +27,8 @@ CREATE TABLE IF NOT EXISTS users_locations (
     CONSTRAINT fk2_users_locations_id FOREIGN KEY (location_id) REFERENCES locations (id)
 );
 
-INSERT INTO users (login, password) VALUES ('johnWolt', '3123');
-INSERT INTO users (login, password) VALUES ('Kira092', '12322');
-INSERT INTO users (login, password) VALUES ('Ursa', '3123123');
-INSERT INTO users (login, password) VALUES ('Hyllsa', '871833');
-INSERT INTO users (login, password) VALUES ('Pllasst', 'mo213123');
+INSERT INTO users (login, email, password) VALUES ('johnWolt', 'johnwolt@kk.com', '3123');
+INSERT INTO users (login, email, password) VALUES ('Kira092', 'kira092@kk.com','12322');
+INSERT INTO users (login, email, password) VALUES ('Ursa', 'ursa@kk.com', '3123123');
+INSERT INTO users (login, email, password) VALUES ('Hyllsa', 'hyllsa@kk.com', '871833');
+INSERT INTO users (login, email, password) VALUES ('Pllasst', 'pllasst@kk.com', 'mo213123');

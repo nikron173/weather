@@ -34,9 +34,12 @@ public class User {
     private long id;
 
     @Column(unique = true,
-            nullable = false,
-            updatable = false)
+            nullable = false)
     private String login;
+
+    @Column(unique = true,
+            nullable = false)
+    private String email;
 
     @Column(nullable = false)
     private String password;

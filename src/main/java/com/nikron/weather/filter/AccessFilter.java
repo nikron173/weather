@@ -24,7 +24,7 @@ import java.util.Optional;
 @WebFilter(urlPatterns = "/*")
 public class AccessFilter implements Filter {
 
-    private List<String> publicPaths = List.of("/singIn", "/registration");
+    private List<String> publicPaths = List.of("/singIn", "/registration", "/content");
     private final SessionRepository sessionRepository = SessionRepository.getInstance();
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -34,6 +34,11 @@ public class AccessFilter implements Filter {
 
         Cookie[] cookies = req.getCookies();
         Optional<Cookie> cookie = checkCookieWeather(cookies);
+
+        if (isPublicPath(req.getRequestURI())) {
+            chain.doFilter(req, resp);
+            return;
+        }
 
         if (cookie.isPresent()) {
             Optional<Session> session = sessionRepository
@@ -72,5 +77,9 @@ public class AccessFilter implements Filter {
             if (cookie.getName().equals("weather")) return Optional.of(cookie);
         }
         return Optional.empty();
+    }
+
+    private boolean isPublicPath(String path) {
+        return publicPaths.stream().filter(x -> path.contains(x)).count() > 0;
     }
 }
