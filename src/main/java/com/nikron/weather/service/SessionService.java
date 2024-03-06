@@ -29,4 +29,8 @@ public class SessionService {
                 HttpServletResponse.SC_NOT_FOUND);
         return mapper.convertToDto(session.get());
     }
+
+    public void delete(String id) {
+        sessionRepository.delete(id);
+    }
 }

@@ -11,12 +11,9 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.Period;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +21,7 @@ import java.util.Optional;
 @WebFilter(urlPatterns = "/*")
 public class AccessFilter implements Filter {
 
-    private List<String> publicPaths = List.of("/singIn", "/registration", "/content");
+    private final List<String> publicPaths = List.of("/signIn", "/registration", "/content", "/search");
     private final SessionRepository sessionRepository = SessionRepository.getInstance();
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -33,44 +30,39 @@ public class AccessFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         Cookie[] cookies = req.getCookies();
-        Optional<Cookie> cookie = checkCookieWeather(cookies);
-
-        if (isPublicPath(req.getRequestURI())) {
-            chain.doFilter(req, resp);
-            return;
-        }
+        Optional<Cookie> cookie = getCookieWeather(cookies);
 
         if (cookie.isPresent()) {
             Optional<Session> session = sessionRepository
-                    .find(Arrays.stream(cookies)
-                            .filter(x -> x.getName().equals("weather"))
-                            .findFirst().get().getValue());
+                    .find(cookie.get().getValue());
             if (session.isPresent()) {
                 int check = session.get().getExpiresAt().compareTo(Instant.now());
                 if (check == 1) {
+                    req.setAttribute("user", session.get().getUser());
                     chain.doFilter(req, resp);
                     return;
                 } else {
                     sessionRepository.delete(session.get().getId());
                 }
-            } else {
-                Cookie cookieNew = new Cookie("weather", "");
-                cookieNew.setMaxAge(0);
-                resp.addCookie(cookieNew);
             }
+            Cookie cookieNew = new Cookie("weather", "");
+            cookieNew.setMaxAge(0);
+            resp.addCookie(cookieNew);
+
+            if (isPublicPath(req.getRequestURI())) {
+                chain.doFilter(req, resp);
+                return;
+            }
+
             resp.sendRedirect(req.getContextPath() + "/signIn");
+        } else if (isPublicPath(req.getRequestURI())) {
+            chain.doFilter(req, resp);
         } else {
-            if (req.getRequestURI().contains("registration")) {
-                chain.doFilter(req, resp);
-            } else if (req.getRequestURI().contains("signIn")) {
-                chain.doFilter(req, resp);
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/signIn");
-            }
+            resp.sendRedirect(req.getContextPath() + "/signIn");
         }
     }
 
-    private Optional<Cookie> checkCookieWeather (Cookie[] cookies) {
+    private Optional<Cookie> getCookieWeather (Cookie[] cookies) {
         if (Objects.isNull(cookies)) return Optional.empty();
 
         for (Cookie cookie : cookies) {
@@ -80,6 +72,6 @@ public class AccessFilter implements Filter {
     }
 
     private boolean isPublicPath(String path) {
-        return publicPaths.stream().filter(x -> path.contains(x)).count() > 0;
+        return publicPaths.stream().anyMatch(path::contains);
     }
 }

@@ -1,22 +1,24 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id bigserial primary key,
     login text not null,
     email text not null,
     password text not null
 );
 
-CREATE TABLE IF NOT EXISTS sessions (
+CREATE TABLE sessions (
     id text primary key,
     user_id int not null,
     expires_at timestamp not null,
     CONSTRAINT fk_session_user_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE IF NOT EXISTS locations (
+CREATE TABLE locations (
     id bigserial primary key,
     name text not null,
-    latitude decimal(3,3) not null,
-    longitude decimal(3,3) not null
+    country text not null,
+    state text,
+    latitude decimal not null,
+    longitude decimal not null
 );
 
 CREATE TABLE IF NOT EXISTS users_locations (

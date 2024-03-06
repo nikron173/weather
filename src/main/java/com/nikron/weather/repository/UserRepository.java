@@ -1,5 +1,6 @@
 package com.nikron.weather.repository;
 
+import com.nikron.weather.entity.Location;
 import com.nikron.weather.entity.User;
 import com.nikron.weather.exception.DatabaseException;
 import com.nikron.weather.util.BuildEntityManagerUtil;
@@ -133,6 +134,64 @@ public class UserRepository implements Repository<Long, User> {
             }
         } catch (Exception e) {
             throw new DatabaseException("Ошибка удаления объекта в базе данных",
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public List<Location> findUserLocationAll(Long id) {
+        try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
+            em.getTransaction().begin();
+            User userDb = em.find(User.class, id);
+            List<Location> locations = userDb.getLocations().stream().toList();
+            em.flush();
+            em.getTransaction().commit();
+            return locations;
+        } catch (Exception e) {
+            throw new DatabaseException("Ошибка получения объектов из базы данных",
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void deleteUserLocation(Long userId, Location location) {
+        try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
+            EntityTransaction transactional = em.getTransaction();
+            try {
+                transactional.begin();
+                User userDb = em.find(User.class, userId);
+                userDb.deleteLocation(location);
+                em.flush();
+                transactional.commit();
+            } catch (Exception e) {
+                if (Objects.nonNull(transactional) && transactional.isActive()) {
+                    transactional.rollback();
+                }
+                throw new DatabaseException("Ошибка удаления объекта в базе данных",
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            throw new DatabaseException("Ошибка получения объектов из базы данных",
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void addUserLocation(Long userId, Location location) {
+        try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
+            EntityTransaction transactional = em.getTransaction();
+            try {
+                transactional.begin();
+                User userDb = em.find(User.class, userId);
+                userDb.addLocation(location);
+                em.flush();
+                transactional.commit();
+            } catch (Exception e) {
+                if (Objects.nonNull(transactional) && transactional.isActive()) {
+                    transactional.rollback();
+                }
+                throw new DatabaseException("Ошибка добавления объекта в базе данных",
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception e) {
+            throw new DatabaseException("Ошибка добавления объектов из базы данных",
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

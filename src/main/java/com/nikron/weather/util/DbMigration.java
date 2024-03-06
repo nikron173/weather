@@ -11,9 +11,9 @@ public class DbMigration {
         Flyway flyway = Flyway.configure()
                 .driver("org.postgresql.Driver")
                 .dataSource(
-                "jdbc:postgresql://localhost:5432/weatherdb",
-                "postgres",
-                "postgres")
+                EnvironmentVariable.URL_DB,
+                EnvironmentVariable.USER_DB,
+                EnvironmentVariable.PASSWORD_DB)
                 .locations("classpath:/db/migration")
                 .load();
         flyway.migrate();

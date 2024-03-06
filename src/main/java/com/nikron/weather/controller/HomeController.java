@@ -1,41 +1,47 @@
 package com.nikron.weather.controller;
 
-import com.nikron.weather.dto.SessionDto;
-import com.nikron.weather.entity.Session;
-import com.nikron.weather.listener.ThymeleafConfiguration;
-import com.nikron.weather.repository.SessionRepository;
-import com.nikron.weather.service.SessionService;
+import com.nikron.weather.dto.ShortLocationDto;
+import com.nikron.weather.entity.User;
+import com.nikron.weather.exception.ApplicationException;
+import com.nikron.weather.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.web.IWebExchange;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @WebServlet(urlPatterns = "/home")
-public class HomeController extends HttpServlet {
+public class HomeController extends BaseController {
 
-    private final SessionService sessionService = SessionService.getInstance();
+    private final UserService userService = UserService.getInstance();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        TemplateEngine engine = (TemplateEngine) getServletContext().getAttribute(ThymeleafConfiguration.THYMELEAF_ENGINE_ATTR);
-        IWebExchange webExchange = JakartaServletWebApplication.buildApplication(getServletContext()).buildExchange(req, resp);
-        WebContext context = new WebContext(webExchange);
-        Cookie cookie = Arrays.stream(req.getCookies())
-                .filter(x -> x.getName().equals("weather"))
-                .findFirst().get();
-        System.out.println("Name: " + cookie.getName() + "\nValue: "
-                + cookie.getValue());
+        Map<String, Object> objectMap = new HashMap<>();
+        User user = (User) req.getAttribute("user");
+        objectMap.put("login", user.getLogin());
+        objectMap.put("userId", user.getId());
+        objectMap.put("forecasts", userService.getForecast(user.getId()));
+        processTemplate("home", objectMap, req, resp);
+    }
 
-        SessionDto dto = sessionService.find(cookie.getValue());
-        context.setVariable("login", dto.getUserLogin());
-        engine.process("main", context, resp.getWriter());
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (Objects.isNull(req.getParameter("name")) &&
+                Objects.isNull(req.getParameter("latitude")) &&
+                Objects.isNull(req.getParameter("longitude"))) throw new ApplicationException("", 500);
+
+        userService.deleteUserLocation(
+                ((User) req.getAttribute("user")).getId(), ShortLocationDto.builder()
+                                .name(req.getParameter("name"))
+                                .latitude(new BigDecimal(req.getParameter("latitude")))
+                                .longitude(new BigDecimal(req.getParameter("longitude")))
+                                .build()
+                );
+        resp.sendRedirect(req.getContextPath() + "/home");
     }
 }
