@@ -3,10 +3,12 @@ package com.nikron.weather.controller;
 import com.nikron.weather.dto.UserDto;
 import com.nikron.weather.entity.Session;
 import com.nikron.weather.entity.User;
+import com.nikron.weather.exception.ApplicationException;
 import com.nikron.weather.mapper.Mapper;
 import com.nikron.weather.mapper.UserMapper;
 import com.nikron.weather.repository.SessionRepository;
 import com.nikron.weather.service.UserService;
+import com.nikron.weather.util.CheckParameter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -32,23 +34,33 @@ public class SignInController extends BaseController {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (Objects.isNull(req.getParameter("login")) &&
-                Objects.isNull(req.getParameter("password"))) throw new RuntimeException("Not found user for authorized");
+        boolean error = false;
+
+        if ((Objects.isNull(req.getParameter("login")) || req.getParameter("login").isBlank()) ||
+                (Objects.isNull(req.getParameter("password")) || req.getParameter("password").isBlank())) {
+            req.setAttribute("error", "Login or password cannot be blank or contain spaces");
+            processTemplate("login", req, resp);
+            return;
+        }
         UserDto dto = UserDto.builder()
                 .login(req.getParameter("login"))
                 .password(req.getParameter("password"))
                 .build();
-        if (userService.verifyUser(dto)) {
-            Session session = new Session(UUID.randomUUID().toString(),
-                    mapper.convertToEntity(dto),
-                    Instant.now().plusSeconds(120));
-            sessionRepository.save(session);
-            Cookie cookie = new Cookie("weather", session.getId());
-            cookie.setMaxAge(3600);
-            resp.addCookie(cookie);
-            resp.sendRedirect(req.getContextPath() + "/home");
-            return;
+
+        try {
+            if (userService.verifyUser(dto)) {
+                Session session = new Session(UUID.randomUUID().toString(),
+                        mapper.convertToEntity(dto),
+                        Instant.now().plusSeconds(1800));
+                sessionRepository.save(session);
+                Cookie cookie = new Cookie("weather", session.getId());
+                cookie.setMaxAge(3600);
+                resp.addCookie(cookie);
+                resp.sendRedirect(req.getContextPath() + "/home");
+            }
+        } catch (ApplicationException e) {
+            req.setAttribute("error", e.getError());
+            processTemplate("login", req, resp);
         }
-        resp.sendRedirect(req.getContextPath() + "/signIn");
     }
 }

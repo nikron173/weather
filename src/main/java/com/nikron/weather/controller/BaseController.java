@@ -14,6 +14,7 @@ import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,7 @@ public class BaseController extends HttpServlet {
         templateResolver.setTemplateMode(TemplateMode.HTML);
         templateResolver.setPrefix("/content/");
         templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding(StandardCharsets.UTF_8.name());
         // Set template cache TTL to 1 hour. If not set, entries would live in cache until expelled by LRU
         //templateResolver.setCacheTTLMs(Long.valueOf(3600000L));
         // Cache is set to true by default. Set to false if you want templates to be automatically updated when modified.
@@ -58,8 +60,8 @@ public class BaseController extends HttpServlet {
         engine.process(templateName, context, resp.getWriter());
     }
 
-    protected Optional<Cookie> getCookie(Cookie[] cookies, String cookieName) {
+    protected Optional<Cookie> getCookie(Cookie[] cookies) {
         if (Objects.isNull(cookies)) return Optional.empty();
-        return Arrays.stream(cookies).filter(cookie -> cookie.getName().equals(cookieName)).findFirst();
+        return Arrays.stream(cookies).filter(cookie -> cookie.getName().equals("weather")).findFirst();
     }
 }

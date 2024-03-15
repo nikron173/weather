@@ -32,4 +32,5 @@ public class Session {
 
     @Column(name = "expires_at")
     private Instant expiresAt;
+
 }

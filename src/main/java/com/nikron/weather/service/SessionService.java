@@ -25,7 +25,7 @@ public class SessionService {
 
     public SessionDto find(String id) {
         Optional<Session> session = sessionRepository.find(id);
-        if (session.isEmpty()) throw new NotFoundResourceException("Session id " + id + " not found",
+        if (session.isEmpty()) throw new NotFoundResourceException(String.format("Session id \"%s\" not found", id),
                 HttpServletResponse.SC_NOT_FOUND);
         return mapper.convertToDto(session.get());
     }

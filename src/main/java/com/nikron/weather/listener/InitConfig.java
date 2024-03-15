@@ -14,6 +14,7 @@ public class InitConfig implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         DbMigration.dbMigration();
         BuildEntityManagerUtil.initEntityManagerFactory();
+        log.info("EntityManagerFactory open");
         ServletContextListener.super.contextInitialized(sce);
     }
 

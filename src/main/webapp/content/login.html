@@ -9,6 +9,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" th:attr="href=@{/content/css/style.css}">
+    <link rel="shortcut icon" th:attr="href=@{/content/image/favicon.ico}">
     <title>Sing In</title>
   </head>
   <body class="">
@@ -20,7 +21,10 @@
           <div class="col">
 
           </div>
-          <div class="col-5">
+          <div class="col-5 d-flex-column justify-content-center">
+            <div th:if="${relogin != null}">
+              <span class="error-app" th:text="${relogin}"></span>
+            </div>
             <form th:action="@{/signIn}" th:method="POST">
               <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
               <div class="form-floating">
@@ -48,6 +52,9 @@
               <button class="btn btn-primary w-100 py-2" type="submit">
                 Sign in
               </button>
+              <div th:if="${error != null}">
+                <span class="error-app" th:text="${error}"></span>
+              </div>
               <p class="mt-5 mb-3 text-body-secondary">&copy; by Nikron</p>
             </form>
           </div>

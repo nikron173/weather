@@ -32,25 +32,41 @@ public class UserRepository implements Repository<Long, User> {
             em.getTransaction().commit();
             return user;
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка получения объекта из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Optional<User> find(String login) {
+    public Optional<User> findByEmail(String email) {
         try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
             em.getTransaction().begin();
-            List<User> users = em.createQuery("FROM User u WHERE u.login = :login", User.class)
-                                .setParameter("login", login)
-                                .getResultList();
+            List<User> users = em.createQuery("FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getResultList();
             em.getTransaction().commit();
             if (users.isEmpty()) {
                 return Optional.empty();
             }
             return Optional.of(users.get(0));
         } catch (Exception e) {
-            System.out.println(e);
-            throw new DatabaseException("Ошибка получения объекта из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public Optional<User> findByLogin(String login) {
+        try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
+            em.getTransaction().begin();
+            List<User> users = em.createQuery("FROM User u WHERE u.login = :login", User.class)
+                    .setParameter("login", login)
+                    .getResultList();
+            em.getTransaction().commit();
+            if (users.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(users.get(0));
+        } catch (Exception e) {
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -63,7 +79,7 @@ public class UserRepository implements Repository<Long, User> {
             em.getTransaction().commit();
             return users;
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка получения объектов из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -82,11 +98,11 @@ public class UserRepository implements Repository<Long, User> {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
                 }
-                throw new DatabaseException("Ошибка сохранения объекта в базу данных",
+                throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка сохранения объекта в базу данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -106,11 +122,11 @@ public class UserRepository implements Repository<Long, User> {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
                 }
-                throw new DatabaseException("Ошибка обновления объекта в базе данных",
+                throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка обновления объекта в базе данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -122,18 +138,18 @@ public class UserRepository implements Repository<Long, User> {
             try {
                 transactional.begin();
                 em.createQuery("DELETE FROM User u WHERE u.id = :id")
-                                .setParameter("id", id)
-                                .executeUpdate();
+                        .setParameter("id", id)
+                        .executeUpdate();
                 transactional.commit();
             } catch (Exception e) {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
                 }
-                throw new DatabaseException("Ошибка удаления объекта в базе данных",
+                throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка удаления объекта в базе данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -147,7 +163,26 @@ public class UserRepository implements Repository<Long, User> {
             em.getTransaction().commit();
             return locations;
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка получения объектов из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public Optional<Location> findUserLocation(Long userId, Long locationId) {
+        try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
+            em.getTransaction().begin();
+            List<Location> locations = em
+                    .createQuery(
+                            "FROM Location l JOIN l.users u WHERE u.id = :userId AND l.id = :locationId",
+                            Location.class)
+                    .setParameter("userId", userId)
+                    .setParameter("locationId", locationId)
+                    .getResultList();
+            em.getTransaction().commit();
+            if (locations.isEmpty()) return Optional.empty();
+            return Optional.of(locations.get(0));
+        } catch (Exception e) {
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -165,11 +200,11 @@ public class UserRepository implements Repository<Long, User> {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
                 }
-                throw new DatabaseException("Ошибка удаления объекта в базе данных",
+                throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка получения объектов из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -180,18 +215,20 @@ public class UserRepository implements Repository<Long, User> {
             try {
                 transactional.begin();
                 User userDb = em.find(User.class, userId);
-                userDb.addLocation(location);
-                em.flush();
+                if (!userDb.getLocations().contains(location)) {
+                    userDb.addLocation(location);
+                    em.flush();
+                }
                 transactional.commit();
             } catch (Exception e) {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
                 }
-                throw new DatabaseException("Ошибка добавления объекта в базе данных",
+                throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
-            throw new DatabaseException("Ошибка добавления объектов из базы данных",
+            throw new DatabaseException(String.format("Database error - %s", e.getMessage()),
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

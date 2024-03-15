@@ -1,53 +1,48 @@
-<header class="header border-bottom">
-    <div class="d-flex flex-row justify-content-center m-2">
-        <div class="d-flex justify-content-center p-2 flex-grow-1">
+<header class="header container border-bottom">
+<!--    <div class="d-flex flex-row justify-content-center align-items-center m-2">-->
+    <div class="row">
+        <div class="d-flex justify-content-center align-items-center col">
             <a th:if="${login == null}" class="navbar-brand" th:href="@{/signIn}">
                 <img
-                        th:attr="src=@{/content/image/weather-logo.png}"
-                        alt="weather-logo"
+                        th:attr="src=@{/content/image/sunny_weather.ico}"
+                        alt="weather-tracker"
                         class="img-logo"
                 />
             </a>
             <a th:if="${login != null}" class="navbar-brand" th:href="@{/home}">
                 <img
-                        th:attr="src=@{/content/image/weather-logo.png}"
-                        alt="weather-logo"
+                        th:attr="src=@{/content/image/sunny_weather.ico}"
+                        alt="weather-tracker"
                         class="img-logo"
                 />
             </a>
         </div>
 
-        <div class="d-flex justify-content-center p-2 flex-grow-1" th:if="${locations == null}">
+        <div class="d-flex justify-content-center p-3 col-5" th:if="${locations == null}">
             <form class="d-flex flex-grow-1" role="search" th:method="GET" th:action="@{/search}">
                 <input name="city" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
         </div>
-
-        <div
-                class="d-flex p-2 flex-grow-1 justify-content-center align-items-center"
-        >
+        <div class="d-flex p-2 flex-grow-1 justify-content-center align-items-center col" th:if="${login != null}">
             <div class="p-2">
-          <span
-                  class="navbar-text p-2"
-                  th:text="'Hi, ' + ${login}"
-                  th:if="${login != null}"
-          ></span>
+                <span class="navbar-text p-2" th:text="'Hi, ' + ${login}"></span>
             </div>
 
             <div class="p-2">
-                <form th:action="@{/logout}" method="get" th:if="${login != null}">
+                <form th:action="@{/logout}" method="GET">
                     <button type="submit" class="btn btn-secondary">Logout</button>
                 </form>
             </div>
-
-            <div class="p-2" th:if="${login == null}">
+        </div>
+        <div class="d-flex p-2 flex-grow-1 justify-content-center align-items-center col" th:if="${login == null}">
+            <div class="p-2">
                 <a th:href="@{/signIn}">
                     <button type="button" class="btn btn-secondary me-2">Sign In</button>
                 </a>
             </div>
 
-            <div class="p-2" th:if="${login == null}">
+            <div class="p-2">
                 <a th:href="@{/registration}">
                     <button type="button" class="btn btn-secondary me-2">Sign Up</button>
                 </a>

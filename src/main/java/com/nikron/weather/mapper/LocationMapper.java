@@ -18,6 +18,7 @@ public class LocationMapper implements Mapper<Location, LocationDto> {
     @Override
     public LocationDto convertToDto(Location entity) {
         return LocationDto.builder()
+                .id(entity.getId())
                 .name(entity.getName())
                 .country(entity.getCountry())
                 .state(entity.getState())

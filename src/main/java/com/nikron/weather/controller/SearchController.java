@@ -1,8 +1,9 @@
 package com.nikron.weather.controller;
 
+import com.nikron.weather.api.exception.WeatherApiException;
 import com.nikron.weather.api.service.WeatherApi;
 import com.nikron.weather.entity.User;
-import com.nikron.weather.exception.ApplicationException;
+import com.nikron.weather.util.CheckParameter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @WebServlet(urlPatterns = "/search")
 public class SearchController extends BaseController {
@@ -20,20 +20,31 @@ public class SearchController extends BaseController {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> objectMap = new HashMap<>();
-        if (Objects.isNull(req.getParameter("city")) || req.getParameter("city").isBlank()) {
+
+        if (getCookie(req.getCookies()).isPresent()) {
+            objectMap.put("login", ((User) req.getAttribute("user")).getLogin());
+            objectMap.put("userId", ((User) req.getAttribute("user")).getId());
+        }
+
+        if (!CheckParameter.checkNameCity(req.getParameter("city"))) {
             objectMap.put("locations", new ArrayList<>());
-            processTemplate("search", req, resp);
+            req.setAttribute("error", "Not valid city name");
+            processTemplate("search", objectMap, req, resp);
             return;
         }
 
         try {
             objectMap.put("locations", api.getLocation(req.getParameter("city")));
-        } catch (InterruptedException e) {
-            throw new ApplicationException("Internal application error", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        if (getCookie(req.getCookies(), "weather").isPresent()) {
-            objectMap.put("login", ((User) req.getAttribute("user")).getLogin());
-            objectMap.put("userId", ((User) req.getAttribute("user")).getId());
+        } catch (IOException | InterruptedException e) {
+            objectMap.put("error", e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            processTemplate("error", objectMap, req, resp);
+            return;
+        } catch (WeatherApiException e) {
+            objectMap.put("error", e.getError());
+            resp.setStatus(e.getCode());
+            processTemplate("error", objectMap, req, resp);
+            return;
         }
         processTemplate("search", objectMap, req, resp);
     }

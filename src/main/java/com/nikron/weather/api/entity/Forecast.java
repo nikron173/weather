@@ -1,16 +1,14 @@
 package com.nikron.weather.api.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nikron.weather.api.entity.Cloud;
-import com.nikron.weather.api.entity.Temperature;
-import com.nikron.weather.api.entity.Weather;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -22,13 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE)
 public class Forecast {
 
-    @JsonProperty("clouds")
-    Cloud cloud;
+    @JsonProperty("list")
+    List<Weather> weathers;
 
-    Weather[] weather;
-
-    @JsonProperty("main")
-    Temperature temperature;
-
-    Wind wind;
 }

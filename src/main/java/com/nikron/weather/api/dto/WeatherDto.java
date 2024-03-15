@@ -2,14 +2,11 @@ package com.nikron.weather.api.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.math.BigDecimal;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -19,7 +16,8 @@ import static lombok.AccessLevel.PRIVATE;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @FieldDefaults(level = PRIVATE)
-public class ForecastDto {
+public class WeatherDto {
+    Long locationId;
     String locationName;
     String locationCountry;
     String locationState;
@@ -40,4 +38,6 @@ public class ForecastDto {
 
     String weatherState;
     String weatherDescription;
+
+    String time;
 }

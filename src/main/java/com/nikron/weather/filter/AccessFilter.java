@@ -48,13 +48,8 @@ public class AccessFilter implements Filter {
             Cookie cookieNew = new Cookie("weather", "");
             cookieNew.setMaxAge(0);
             resp.addCookie(cookieNew);
-
-            if (isPublicPath(req.getRequestURI())) {
-                chain.doFilter(req, resp);
-                return;
-            }
-
-            resp.sendRedirect(req.getContextPath() + "/signIn");
+            req.setAttribute("relogin", "Session has expired. Please re-login");
+            req.getRequestDispatcher("/signIn").forward(req, resp);
         } else if (isPublicPath(req.getRequestURI())) {
             chain.doFilter(req, resp);
         } else {

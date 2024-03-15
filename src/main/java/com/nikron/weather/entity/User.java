@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,11 +56,11 @@ public class User {
     )
     private List<Location> locations = new ArrayList<>();
 
-    public boolean addLocation(Location location) {
-        return locations.add(location);
+    public void addLocation(Location location) {
+        locations.add(location);
     }
 
-    public boolean deleteLocation(Location location) {
-        return locations.remove(location);
+    public void deleteLocation(Location location) {
+        locations.remove(location);
     }
 }

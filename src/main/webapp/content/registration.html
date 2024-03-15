@@ -9,7 +9,8 @@
             crossorigin="anonymous"
     />
     <link rel="stylesheet" th:attr="href=@{/content/css/style.css}">
-    <title>Sing In</title>
+    <link rel="shortcut icon" th:attr="href=@{/content/image/favicon.ico}">
+    <title>Sing Up</title>
 </head>
 <body class="">
 <div th:replace="~{header :: header}"></div>
@@ -34,6 +35,9 @@
                         />
                         <label for="floatingInput">Login</label>
                     </div>
+                    <div th:if="${errorLogin != null}">
+                        <span class="error-app" th:text="${errorLogin}"></span>
+                    </div>
                     <div class="form-floating">
                         <input
                                 name="email"
@@ -45,6 +49,9 @@
                         />
                         <label for="floatingEmail">Email</label>
                     </div>
+                    <div th:if="${errorEmail != null}">
+                        <span class="error-app" th:text="${errorEmail}"></span>
+                    </div>
                     <div class="form-floating">
                         <input
                                 name="password"
@@ -55,6 +62,12 @@
                                 required
                         />
                         <label for="floatingPassword">Password</label>
+                    </div>
+                    <div th:if="${errorPasswd != null}">
+                        <span class="error-app" th:text="${errorPasswd}"></span>
+                    </div>
+                    <div th:if="${error != null}">
+                        <span class="error-app" th:text="${error}"></span>
                     </div>
                     <button class="btn btn-primary w-100 py-2" type="submit">
                         Sign up
