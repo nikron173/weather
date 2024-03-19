@@ -4,6 +4,7 @@ import com.nikron.weather.dto.UserDto;
 import com.nikron.weather.entity.Session;
 import com.nikron.weather.entity.User;
 import com.nikron.weather.exception.ApplicationException;
+import com.nikron.weather.exception.NotFoundResourceException;
 import com.nikron.weather.mapper.Mapper;
 import com.nikron.weather.mapper.UserMapper;
 import com.nikron.weather.repository.SessionRepository;
@@ -17,6 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -34,12 +37,11 @@ public class SignInController extends BaseController {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        boolean error = false;
-
+        Map<String, Object> objectMap = new HashMap<>();
         if ((Objects.isNull(req.getParameter("login")) || req.getParameter("login").isBlank()) ||
                 (Objects.isNull(req.getParameter("password")) || req.getParameter("password").isBlank())) {
-            req.setAttribute("error", "Login or password cannot be blank or contain spaces");
-            processTemplate("login", req, resp);
+            objectMap.put("error", "Login or password cannot be blank or contain spaces");
+            processTemplate("login", objectMap ,req, resp);
             return;
         }
         UserDto dto = UserDto.builder()
@@ -57,10 +59,17 @@ public class SignInController extends BaseController {
                 cookie.setMaxAge(3600);
                 resp.addCookie(cookie);
                 resp.sendRedirect(req.getContextPath() + "/home");
+                return;
             }
+            objectMap.put("error", "Login or password not valid");
+            processTemplate("login", objectMap ,req, resp);
+        } catch (NotFoundResourceException e) {
+            objectMap.put("error", e.getError());
+            resp.setStatus(e.getCode());
+            processTemplate("login", objectMap ,req, resp);
         } catch (ApplicationException e) {
             req.setAttribute("error", e.getError());
-            processTemplate("login", req, resp);
+            processTemplate("error", req, resp);
         }
     }
 }

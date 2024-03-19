@@ -45,8 +45,8 @@ public class WeatherApi {
                 .GET()
                 .timeout(Duration.ofSeconds(10))
                 .build();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) throw new WeatherApiException(
                 String.format("Service access error https://api.openweathermap.org. %s",
                         response.body().isBlank() ? "Try again later" :
@@ -64,40 +64,23 @@ public class WeatherApi {
                 .GET()
                 .timeout(Duration.ofSeconds(10))
                 .build();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
         Forecast forecast = mapper.readValue(response.body(), Forecast.class);
-        return forecast.getWeathers().stream().map(weather -> WeatherDto.builder()
-                .locationId(location.getId())
-                .locationName(location.getName())
-                .locationCountry(location.getCountry())
-                .locationState(location.getState())
-                .latitude(String.valueOf(location.getLatitude()))
-                .longitude(String.valueOf(location.getLongitude()))
-                .temp(String.valueOf(weather.getTemperature().getTemp()))
-                .tempMin(String.valueOf(weather.getTemperature().getTempMin()))
-                .tempMax(String.valueOf(weather.getTemperature().getTempMax()))
-                .humidity(String.valueOf(weather.getTemperature().getHumidity()))
-                .feelsLike(String.valueOf(weather.getTemperature().getFeelsLike()))
-                .windDeg(String.valueOf(weather.getWind().getDeg()))
-                .windSpeed(String.valueOf(weather.getWind().getSpeed()))
-                .windGust(String.valueOf(weather.getWind().getGust()))
-                .cloud(String.valueOf(weather.getCloud().getCloud()))
-                .weatherState(weather.getWeatherState()[0].getState())
-                .weatherDescription(weather.getWeatherState()[0].getDescription())
-                .time(weather.getTime().format(DateTimeFormatter.ofPattern("dd/MM HH:mm:ss")))
-                .build()).toList();
-    };
+        return forecast.getWeathers().stream().map(this::weatherToDto).toList();
+    }
 
-    public WeatherDto getWeather(LocationDto dto) throws IOException, InterruptedException {
+    ;
+
+    public WeatherDto getWeather(Location location) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(String.format(urlWeather,
-                        dto.getLatitude(), dto.getLongitude(), EnvironmentVariable.APP_ID)))
+                        location.getLatitude(), location.getLongitude(), EnvironmentVariable.APP_ID)))
                 .GET()
                 .timeout(Duration.ofSeconds(10))
                 .build();
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) throw new WeatherApiException(
                 String.format("Service access error https://api.openweathermap.org. %s",
                         response.body().isBlank() ? "Try again later" :
@@ -105,13 +88,11 @@ public class WeatherApi {
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR
         );
         Weather weather = mapper.readValue(response.body(), Weather.class);
+        return weatherToDto(weather);
+    }
+
+    private WeatherDto weatherToDto(Weather weather) {
         return WeatherDto.builder()
-                .locationId(dto.getId())
-                .locationName(dto.getName())
-                .locationCountry(dto.getCountry())
-                .locationState(dto.getState())
-                .latitude(String.valueOf(dto.getLatitude()))
-                .longitude(String.valueOf(dto.getLongitude()))
                 .temp(String.valueOf(weather.getTemperature().getTemp()))
                 .tempMin(String.valueOf(weather.getTemperature().getTempMin()))
                 .tempMax(String.valueOf(weather.getTemperature().getTempMax()))
@@ -123,7 +104,7 @@ public class WeatherApi {
                 .cloud(String.valueOf(weather.getCloud().getCloud()))
                 .weatherState(weather.getWeatherState()[0].getState())
                 .weatherDescription(weather.getWeatherState()[0].getDescription())
-                .time(weather.getTime().format(DateTimeFormatter.ofPattern("hh:mm:ss")))
+                .time(weather.getTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
                 .build();
     }
 }

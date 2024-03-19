@@ -5,11 +5,11 @@ import org.flywaydb.core.Flyway;
 
 @Slf4j
 public class DbMigration {
-    public static void dbMigration() {
+    public static void dbMigration(String driver) {
 
         log.info("Started database migration");
         Flyway flyway = Flyway.configure()
-                .driver("org.postgresql.Driver")
+                .driver(driver)
                 .dataSource(
                 EnvironmentVariable.URL_DB,
                 EnvironmentVariable.USER_DB,

@@ -17,6 +17,7 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "locations")
@@ -26,7 +27,6 @@ import java.util.List;
 @ToString(exclude = {"users"})
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"users"})
 public class Location {
 
     @Id
@@ -46,5 +46,16 @@ public class Location {
 
     private BigDecimal longitude;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return Objects.equals(latitude, location.latitude) && Objects.equals(longitude, location.longitude);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(latitude, longitude);
+    }
 }

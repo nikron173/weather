@@ -25,8 +25,8 @@ public class SearchController extends BaseController {
             objectMap.put("login", ((User) req.getAttribute("user")).getLogin());
             objectMap.put("userId", ((User) req.getAttribute("user")).getId());
         }
-
-        if (!CheckParameter.checkNameCity(req.getParameter("city"))) {
+        String city = req.getParameter("city").trim();
+        if (!CheckParameter.checkNameCity(city)) {
             objectMap.put("locations", new ArrayList<>());
             req.setAttribute("error", "Not valid city name");
             processTemplate("search", objectMap, req, resp);
@@ -34,7 +34,7 @@ public class SearchController extends BaseController {
         }
 
         try {
-            objectMap.put("locations", api.getLocation(req.getParameter("city")));
+            objectMap.put("locations", api.getLocation(city));
         } catch (IOException | InterruptedException e) {
             objectMap.put("error", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

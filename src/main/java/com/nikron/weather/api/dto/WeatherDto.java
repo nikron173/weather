@@ -17,13 +17,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Data
 @FieldDefaults(level = PRIVATE)
 public class WeatherDto {
-    Long locationId;
-    String locationName;
-    String locationCountry;
-    String locationState;
-    String latitude;
-    String longitude;
-
     String temp;
     String tempMin;
     String tempMax;

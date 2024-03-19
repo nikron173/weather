@@ -1,0 +1,41 @@
+version: "3"
+services:
+  db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "weatherdb"
+    ports:
+      - "5432:5432"
+    networks:
+      backend-weather:
+        ipv4_address: 172.28.100.5
+
+  web:
+    image: weather:1.0
+    build:
+      dockerfile: Dockerfile
+      context: .
+    depends_on:
+      - db
+
+    environment:
+      URL_DB: "jdbc:postgresql://172.28.100.5/weatherdb"
+      APP_ID: "fa45522effc9e7966ecd44f894672fb4"
+      PASSWORD_DB: "postgres"
+      USER_DB: "postgres"
+    ports:
+      - "8080:8080"
+    networks:
+      backend-weather:
+        ipv4_address: 172.28.100.11
+
+networks:
+  backend-weather:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.100.0/24
+          ip_range: 172.28.100.0/24
+          gateway: 172.28.100.254

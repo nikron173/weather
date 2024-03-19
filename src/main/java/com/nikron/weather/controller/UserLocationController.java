@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet(urlPatterns = {"/user/location", "/user/location/"})
+@WebServlet(urlPatterns = {"/user/location", "/user/location/*"})
 public class UserLocationController extends BaseController {
     private final UserService userService = UserService.getInstance();
     private final WeatherApi api = WeatherApi.getInstance();
@@ -43,7 +43,7 @@ public class UserLocationController extends BaseController {
 //                Objects.isNull(req.getParameter("latitude")) &&
 //                Objects.isNull(req.getParameter("longitude"))) throw new ApplicationException("", 500);
 
-        if (!CheckParameter.checkId(req.getParameter("location_id"))) {
+        if (!CheckParameter.checkLongId(req.getParameter("location_id"))) {
             req.setAttribute("error", "Not valid location id");
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             processTemplate("error", req, resp);
@@ -68,12 +68,14 @@ public class UserLocationController extends BaseController {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String[] str = req.getRequestURI().split("/");
-        String strLocationId = str[str.length-1];
+        if ("/user/location".equals(req.getRequestURI()))
+            throw new ApplicationException("Page not found", HttpServletResponse.SC_NOT_FOUND);
+        String strLocationId = req.getRequestURI()
+                .replace(req.getContextPath() + "/user/location/", "");
         User user = (User) req.getAttribute("user");
         Map<String, Object> objectMap = new HashMap<>();
 
-        if (!CheckParameter.checkId(strLocationId)) {
+        if (!CheckParameter.checkLongId(strLocationId)) {
             objectMap.put("login", user.getLogin());
             objectMap.put("userId", user.getId());
             objectMap.put("error", "Not valid path or location id");

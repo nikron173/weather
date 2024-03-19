@@ -24,7 +24,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"locations"})
+@ToString(exclude = {"locations", "password"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {

@@ -27,14 +27,13 @@ public class CheckParameter {
     }
 
     public static boolean checkNameCity(String city) {
-        return !Objects.isNull(city) && !city.isBlank() && !city.matches(".*[0-9,;!.><?&@#$%^*()/].*");
+        return !Objects.isNull(city) && !city.isBlank() && !city.matches(".*[0-9,;!.><?&@#$%^*()/ ].*");
     }
 
-    public static boolean checkId(String id) {
+    public static boolean checkLongId(String id) {
         if (Objects.isNull(id)) return false;
         try {
-            Long.parseLong(id);
-            return true;
+            return Long.parseLong(id) > 0;
         } catch (NumberFormatException e) {
             return false;
         }

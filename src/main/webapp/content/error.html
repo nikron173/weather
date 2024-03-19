@@ -13,9 +13,12 @@
 </div>
 
 <section class="container">
-    <div th:if="${error != null}">
-        <div class="col text-center">
-            <span class="error-app" th:text="'Error: ' + ${error}"></span>
+    <div class="row">
+        <div class="col-1">
+            <button class="btn btn-primary" onclick="javascript:window.history.back();">Back</button>
+        </div>
+        <div th:if="${error != null}" class="col text-center">
+                <span class="error-app" th:text="'Error: ' + ${error}"></span>
         </div>
     </div>
 </section>
