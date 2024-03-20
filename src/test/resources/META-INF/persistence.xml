@@ -3,17 +3,23 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
              version="3.1">
 
-    <persistence-unit name="weather-db" transaction-type="RESOURCE_LOCAL">
+    <persistence-unit name="weather-db-test" transaction-type="RESOURCE_LOCAL">
+
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>com.nikron.weather.entity.User</class>
+        <class>com.nikron.weather.entity.Location</class>
+        <class>com.nikron.weather.entity.Session</class>
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action" value="none"/>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:weatherdb"/>
-            <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="postgres"/>
+<!--            <property name="jakarta.persistence.jdbc.user" value="postgres"/>-->
+<!--            <property name="jakarta.persistence.jdbc.password" value="postgres"/>-->
             <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.connection.pool_size" value="5"/>
         </properties>
+
     </persistence-unit>
 </persistence>

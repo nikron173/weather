@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS users_locations (
     CONSTRAINT fk2_users_locations_id FOREIGN KEY (location_id) REFERENCES locations (id)
 );
 
-INSERT INTO users (login, email, password) VALUES ('johnWolt', 'johnwolt@kk.com', '3123');
-INSERT INTO users (login, email, password) VALUES ('Kira092', 'kira092@kk.com','12322');
-INSERT INTO users (login, email, password) VALUES ('Ursa', 'ursa@kk.com', '3123123');
-INSERT INTO users (login, email, password) VALUES ('Hyllsa', 'hyllsa@kk.com', '871833');
-INSERT INTO users (login, email, password) VALUES ('Pllasst', 'pllasst@kk.com', 'mo213123');
+-- INSERT INTO users (login, email, password) VALUES ('johnWolt', 'johnwolt@kk.com', '3123');
+-- INSERT INTO users (login, email, password) VALUES ('Kira092', 'kira092@kk.com','12322');
+-- INSERT INTO users (login, email, password) VALUES ('Ursa', 'ursa@kk.com', '3123123');
+-- INSERT INTO users (login, email, password) VALUES ('Hyllsa', 'hyllsa@kk.com', '871833');
+-- INSERT INTO users (login, email, password) VALUES ('Pllasst', 'pllasst@kk.com', 'mo213123');

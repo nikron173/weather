@@ -95,10 +95,6 @@ public class UserService {
         return EncodePassword.verifyPassword(dto.getPassword(), user.get().getPassword());
     }
 
-    public UserDto update(Long id, UserDto dto) {
-        return null;
-    }
-
     public List<LocationDto> findUserLocationAll(Long userId) {
         return userRepository.findUserLocationAll(userId)
                 .stream()

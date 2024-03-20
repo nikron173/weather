@@ -18,7 +18,7 @@ public class BuildEntityManagerUtil {
         return emf;
     }
 
-    public static void initEntityManagerFactory() {
+    public static void initEntityManagerFactory(String persistenceUnitName) {
         if (Objects.isNull(emf)) {
             try {
                 log.info("Create entityManagerFactory");
@@ -27,7 +27,7 @@ public class BuildEntityManagerUtil {
                 configOver.put("jakarta.persistence.jdbc.user", EnvironmentVariable.USER_DB);
                 configOver.put("jakarta.persistence.jdbc.password", EnvironmentVariable.PASSWORD_DB);
                 emf = Persistence
-                        .createEntityManagerFactory("weather-db", configOver);
+                        .createEntityManagerFactory(persistenceUnitName, configOver);
                 log.info("Info about entityManagerFactory: isOpen - {}, Properties - {}", emf.isOpen(), emf.getProperties());
             } catch (Exception e) {
                 throw new RuntimeException(e);

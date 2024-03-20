@@ -12,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 public class InitConfig implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        DbMigration.dbMigration("org.postgresql.Driver");
-        BuildEntityManagerUtil.initEntityManagerFactory();
+        BuildEntityManagerUtil.initEntityManagerFactory("weather-db");
         log.info("EntityManagerFactory open");
+        DbMigration.dbMigration("org.postgresql.Driver");
         ServletContextListener.super.contextInitialized(sce);
     }
 
