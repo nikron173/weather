@@ -24,6 +24,7 @@
 * Tomcat
 * Hibernate
 * PostgreSQL
+* FlyWay
 
 ## Внешний вид
 ![img.png](img/img.png)
