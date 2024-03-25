@@ -17,9 +17,10 @@
         <div class="col-1">
             <button class="btn btn-primary" onclick="javascript:window.history.back();">Back</button>
         </div>
-        <div th:if="${error != null}" class="col text-center">
+        <div th:if="${error != null}" class="col d-flex justify-content-center align-items-end">
                 <span class="error-app" th:text="'Error: ' + ${error}"></span>
         </div>
+        <div class="col-1"></div>
     </div>
 </section>
 

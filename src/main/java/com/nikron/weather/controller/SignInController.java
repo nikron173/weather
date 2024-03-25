@@ -9,7 +9,6 @@ import com.nikron.weather.mapper.Mapper;
 import com.nikron.weather.mapper.UserMapper;
 import com.nikron.weather.repository.SessionRepository;
 import com.nikron.weather.service.UserService;
-import com.nikron.weather.util.CheckParameter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -30,6 +29,7 @@ public class SignInController extends BaseController {
     private final SessionRepository sessionRepository = SessionRepository.getInstance();
 
     private final Mapper<User, UserDto> mapper = UserMapper.getInstance();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         processTemplate("login", req, resp);
@@ -41,7 +41,7 @@ public class SignInController extends BaseController {
         if ((Objects.isNull(req.getParameter("login")) || req.getParameter("login").isBlank()) ||
                 (Objects.isNull(req.getParameter("password")) || req.getParameter("password").isBlank())) {
             objectMap.put("error", "Login or password cannot be blank or contain spaces");
-            processTemplate("login", objectMap ,req, resp);
+            processTemplate("login", objectMap, req, resp);
             return;
         }
         UserDto dto = UserDto.builder()
@@ -53,7 +53,8 @@ public class SignInController extends BaseController {
             if (userService.verifyUser(dto)) {
                 Session session = new Session(UUID.randomUUID().toString(),
                         mapper.convertToEntity(dto),
-                        Instant.now().plusSeconds(1800));
+                        Instant.now().plusSeconds(1800)
+                );
                 sessionRepository.save(session);
                 Cookie cookie = new Cookie("weather", session.getId());
                 cookie.setMaxAge(3600);
@@ -62,11 +63,11 @@ public class SignInController extends BaseController {
                 return;
             }
             objectMap.put("error", "Login or password not valid");
-            processTemplate("login", objectMap ,req, resp);
+            processTemplate("login", objectMap, req, resp);
         } catch (NotFoundResourceException e) {
             objectMap.put("error", e.getError());
             resp.setStatus(e.getCode());
-            processTemplate("login", objectMap ,req, resp);
+            processTemplate("login", objectMap, req, resp);
         } catch (ApplicationException e) {
             req.setAttribute("error", e.getError());
             processTemplate("error", req, resp);

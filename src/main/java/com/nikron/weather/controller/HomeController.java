@@ -23,8 +23,6 @@ public class HomeController extends BaseController {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> objectMap = new HashMap<>();
         User user = (User) req.getAttribute("user");
-        objectMap.put("login", user.getLogin());
-        objectMap.put("userId", user.getId());
         try {
             objectMap.put("forecasts", userService.getForecast(user.getId()));
         } catch (WeatherApiException e) {

@@ -1,15 +1,18 @@
 package com.nikron.weather.util;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class CheckParameter {
 
-    private static final String regxPasswd = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+    private static final String regxPasswd = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,20}$";
     private static final String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
-    private static final Pattern patternPasswd = Pattern.compile(regxPasswd, Pattern.CASE_INSENSITIVE);
+    private static final Pattern patternPasswd = Pattern.compile(regxPasswd);
     private static final Pattern patternEmail = Pattern.compile(regexEmail);
 
     public static boolean checkPassword(String passwd) {
@@ -28,6 +31,19 @@ public class CheckParameter {
 
     public static boolean checkNameCity(String city) {
         return !Objects.isNull(city) && !city.isBlank() && !city.matches(".*[0-9,;!.><?&@#$%^*()/ ].*");
+    }
+
+    public static boolean checkLocationFields(HttpServletRequest request){
+        if (!checkNameCity(request.getParameter("name"))) return false;
+        if (Objects.isNull(request.getParameter("longitude"))) return false;
+        if (Objects.isNull(request.getParameter("latitude"))) return false;
+        try {
+            new BigDecimal(request.getParameter("longitude"));
+            new BigDecimal(request.getParameter("latitude"));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean checkLongId(String id) {

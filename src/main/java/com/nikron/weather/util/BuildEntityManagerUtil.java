@@ -35,6 +35,24 @@ public class BuildEntityManagerUtil {
         }
     }
 
+    public static void initEntityManagerFactory(String persistenceUnitName, String URL_DB,
+                                                String USER_DB, String PASSWORD_DB) {
+        if (Objects.isNull(emf)) {
+            try {
+                log.info("Create entityManagerFactory");
+                Map<String, Object> configOver = new HashMap<>();
+                configOver.put("jakarta.persistence.jdbc.url", URL_DB);
+                configOver.put("jakarta.persistence.jdbc.user", USER_DB);
+                configOver.put("jakarta.persistence.jdbc.password", PASSWORD_DB);
+                emf = Persistence
+                        .createEntityManagerFactory(persistenceUnitName, configOver);
+                log.info("Info about entityManagerFactory: isOpen - {}, Properties - {}", emf.isOpen(), emf.getProperties());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static EntityManager getEntityManager() {
         return emf.createEntityManager();
     }

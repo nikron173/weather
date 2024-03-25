@@ -66,7 +66,7 @@ public class UserService {
         return userRepository.findAll().stream().map(userMapper::convertToDto).toList();
     }
 
-    public UserDto create(CreateUserDto dto) throws BadRequestException {
+    public UserDto save(CreateUserDto dto) throws BadRequestException {
         log.info("Start process creating user - {}", dto);
         User user = createUserMapper.convertToEntity(dto);
         if (userRepository.findByLogin(user.getLogin()).isPresent()) {
@@ -79,8 +79,9 @@ public class UserService {
             throw new BadRequestException(String.format("Email \"%s\" is already taken", user.getEmail()),
                     HttpServletResponse.SC_BAD_REQUEST);
         }
+        userRepository.save(user);
         log.info("{} - created successfully", user);
-        return userMapper.convertToDto(userRepository.save(user));
+        return userMapper.convertToDto(user);
     }
 
     public boolean verifyUser(UserDto dto) throws NotFoundResourceException {
@@ -127,35 +128,36 @@ public class UserService {
     }
 
     public void deleteUserLocation(Long userId, Long locationId) throws NotFoundResourceException {
-        Optional<Location> location = locationRepository.find(locationId);
         log.info("Search for a location with an ID \"{}\" for a user with an ID \"{}\"", locationId, userId);
+        Optional<Location> location = locationRepository.find(locationId);
         if (location.isEmpty()) {
-            log.error("Location with an ID \"{}\" for a user with an ID \"{}\" not found", locationId, userId);
+            log.error("Location with an ID \"{}\" not found", locationId);
             throw new NotFoundResourceException(
                     String.format("Location with id \"%d\" not found", locationId),
                     HttpServletResponse.SC_NOT_FOUND
             );
         }
-        userRepository.deleteUserLocation(userId, location.get());
+        if (!userRepository.deleteUserLocation(userId, location.get())) {
+            log.error("Location with an ID \"{}\" for a user with an ID \"{}\" not found", locationId, userId);
+            throw new NotFoundResourceException(String.format(
+                    "Location with an ID \"%s\" for a user with an ID \"%s\" not found", locationId, userId),
+                    HttpServletResponse.SC_NOT_FOUND);
+        }
         log.info("Location with ID \"{}\" deleted successfully for a user with an ID \"{}\"", locationId, userId);
     }
 
     public void addUserLocation(Long id, LocationDto dto) {
         Location location = locationMapper.convertToEntity(dto);
+        log.info("Search location \"{}\" in database", location);
         Optional<Location> optionalLocation = locationRepository
                 .find(location.getName(), location.getLatitude(), location.getLongitude());
-        log.info("Search location \"{}\" in database", location);
         if (optionalLocation.isEmpty()) {
-            log.info("Location \"{}\" not found in database and start process save location", location);
-            locationRepository.save(location);
-            log.info("Location \"{}\" save successfully", location);
-            userRepository.addUserLocation(id, location);
-            log.info("Location \"{}\" successfully add user with ID \"{}\"", location, id);
+            throw new NotFoundResourceException(String.format("Location \"%s\" not found", dto.getName()),
+                    HttpServletResponse.SC_NOT_FOUND);
         } else {
             userRepository.addUserLocation(id, optionalLocation.get());
             log.info("Location \"{}\" successfully add user with ID \"{}\"", optionalLocation.get(), id);
         }
-
     }
 
     public Map<Location, WeatherDto> getForecast(Long userId) throws NotFoundResourceException {

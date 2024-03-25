@@ -20,11 +20,6 @@ public class SearchController extends BaseController {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> objectMap = new HashMap<>();
-
-        if (getCookie(req.getCookies()).isPresent()) {
-            objectMap.put("login", ((User) req.getAttribute("user")).getLogin());
-            objectMap.put("userId", ((User) req.getAttribute("user")).getId());
-        }
         String city = req.getParameter("city").trim();
         if (!CheckParameter.checkNameCity(city)) {
             objectMap.put("locations", new ArrayList<>());

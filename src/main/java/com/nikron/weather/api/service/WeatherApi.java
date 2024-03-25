@@ -104,7 +104,7 @@ public class WeatherApi {
                 .cloud(String.valueOf(weather.getCloud().getCloud()))
                 .weatherState(weather.getWeatherState()[0].getState())
                 .weatherDescription(weather.getWeatherState()[0].getDescription())
-                .time(weather.getTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .time(weather.getTime().format(DateTimeFormatter.ofPattern("dd/MM HH:mm")))
                 .build();
     }
 }

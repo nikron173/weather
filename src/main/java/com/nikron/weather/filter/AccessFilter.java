@@ -39,6 +39,10 @@ public class AccessFilter implements Filter {
                 int check = session.get().getExpiresAt().compareTo(Instant.now());
                 if (check == 1) {
                     req.setAttribute("user", session.get().getUser());
+                    if (req.getRequestURI().matches(req.getContextPath() + "/signIn")) {
+                        req.getRequestDispatcher("/home").forward(req, resp);
+                        return;
+                    }
                     chain.doFilter(req, resp);
                     return;
                 } else {

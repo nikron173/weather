@@ -60,7 +60,7 @@ public class User {
         locations.add(location);
     }
 
-    public void deleteLocation(Location location) {
-        locations.remove(location);
+    public boolean deleteLocation(Location location) {
+        return locations.remove(location);
     }
 }

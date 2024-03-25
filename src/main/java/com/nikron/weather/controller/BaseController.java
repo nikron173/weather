@@ -1,5 +1,6 @@
 package com.nikron.weather.controller;
 
+import com.nikron.weather.entity.User;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -44,6 +45,11 @@ public class BaseController extends HttpServlet {
                 .buildApplication(getServletContext())
                 .buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
+        if (Objects.nonNull(req.getAttribute("user"))) {
+            User user = (User) req.getAttribute("user");
+            objects.put("login", user.getLogin());
+            objects.put("userId", user.getId());
+        }
         for (var object : objects.entrySet()) {
             context.setVariable(object.getKey(), object.getValue());
         }

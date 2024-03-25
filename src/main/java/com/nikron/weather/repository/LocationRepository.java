@@ -28,9 +28,9 @@ public class LocationRepository implements Repository<Long, Location> {
     public Optional<Location> find(Long id) {
         try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
             em.getTransaction().begin();
-            Optional<Location> user = Optional.ofNullable(em.find(Location.class, id));
+            Optional<Location> location = Optional.ofNullable(em.find(Location.class, id));
             em.getTransaction().commit();
-            return user;
+            return location;
         } catch (Exception e) {
             throw new DatabaseException("Ошибка получения объекта из базы данных",
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -42,7 +42,7 @@ public class LocationRepository implements Repository<Long, Location> {
             em.getTransaction().begin();
             List<Location> locations =
                     em.createQuery("FROM Location l " +
-                                            "WHERE l.name = :name AND l.latitude = :latitude AND l.longitude =: longitude",
+                                            "WHERE l.name = :name AND l.latitude = :latitude AND l.longitude = :longitude",
                                     Location.class)
                             .setParameter("name", name)
                             .setParameter("latitude", latitude)
@@ -65,7 +65,7 @@ public class LocationRepository implements Repository<Long, Location> {
             em.getTransaction().begin();
             List<Location> locations =
                     em.createQuery("FROM Location l " +
-                                            "WHERE l.latitude = :latitude AND l.longitude =: longitude",
+                                            "WHERE l.latitude = :latitude AND l.longitude = :longitude",
                                     Location.class)
                             .setParameter("latitude", latitude)
                             .setParameter("longitude", longitude)

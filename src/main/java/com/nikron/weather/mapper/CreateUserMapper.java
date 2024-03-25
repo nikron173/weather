@@ -29,7 +29,7 @@ public class CreateUserMapper implements Mapper<User, CreateUserDto> {
         return User.builder()
                 .login(dto.getLogin())
                 .password(EncodePassword.encodePassword(dto.getPassword()))
-                .email(dto.getEmail())
+                .email(dto.getEmail().toLowerCase())
                 .build();
     }
 }

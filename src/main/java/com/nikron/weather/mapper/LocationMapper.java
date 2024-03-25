@@ -30,6 +30,7 @@ public class LocationMapper implements Mapper<Location, LocationDto> {
     @Override
     public Location convertToEntity(LocationDto dto) {
         return Location.builder()
+                .id(dto.getId())
                 .name(dto.getName())
                 .country(dto.getCountry())
                 .state(dto.getState())

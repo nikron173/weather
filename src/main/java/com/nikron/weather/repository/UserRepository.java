@@ -187,15 +187,16 @@ public class UserRepository implements Repository<Long, User> {
         }
     }
 
-    public void deleteUserLocation(Long userId, Location location) {
+    public boolean deleteUserLocation(Long userId, Location location) {
         try (EntityManager em = BuildEntityManagerUtil.getEntityManager()) {
             EntityTransaction transactional = em.getTransaction();
             try {
                 transactional.begin();
                 User userDb = em.find(User.class, userId);
-                userDb.deleteLocation(location);
+                boolean operation = userDb.deleteLocation(location);
                 em.flush();
                 transactional.commit();
+                return operation;
             } catch (Exception e) {
                 if (Objects.nonNull(transactional) && transactional.isActive()) {
                     transactional.rollback();
