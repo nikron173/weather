@@ -30,7 +30,8 @@ public class CheckParameter {
     }
 
     public static boolean checkNameCity(String city) {
-        return !Objects.isNull(city) && !city.isBlank() && !city.matches(".*[0-9,;!.><?&@#$%^*()/].*");
+        return !Objects.isNull(city) && !city.isBlank()
+                && !city.matches(".*[0-9,;!.><?&@#$%^*()/].*") && city.length() < 64;
     }
 
     public static boolean checkLocationFields(HttpServletRequest request){

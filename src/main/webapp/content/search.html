@@ -29,7 +29,10 @@
         <div class="col-3"></div>
     </div>
 
-    <div th:if="${locations != null}" class="container text-center">
+    <div th:if="${locations != null && locations.size() == 0}" class="container text-center">
+        <span style="font-size: 1.3em" th:text="'Location with name \'' + ${city} + '\' not found'"></span>
+    </div>
+    <div th:if="${locations != null && locations.size() > 0}" class="container text-center">
         <div class="row justify-content-center">
             <div class="location col-3" th:each="location : ${locations}">
                 <form class="d-flex flex-column" th:method="POST" th:action="@{/user/location}">

@@ -41,7 +41,7 @@ public class WeatherApi {
 
     public List<LocationDto> getLocation(String location) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format(urlLocation, location, EnvironmentVariable.APP_ID)))
+                .uri(URI.create(String.format(urlLocation, location.replaceAll(" ", "%20"), EnvironmentVariable.APP_ID)))
                 .GET()
                 .timeout(Duration.ofSeconds(10))
                 .build();

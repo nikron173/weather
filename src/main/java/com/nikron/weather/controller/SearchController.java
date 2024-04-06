@@ -22,7 +22,7 @@ public class SearchController extends BaseController {
         Map<String, Object> objectMap = new HashMap<>();
         String city = req.getParameter("city").trim();
         if (!CheckParameter.checkNameCity(city)) {
-            objectMap.put("locations", new ArrayList<>());
+//            objectMap.put("locations", new ArrayList<>());
             req.setAttribute("error", "Not valid city name");
             processTemplate("search", objectMap, req, resp);
             return;
@@ -30,6 +30,7 @@ public class SearchController extends BaseController {
 
         try {
             objectMap.put("locations", api.getLocation(city));
+            objectMap.put("city", city);
         } catch (IOException | InterruptedException e) {
             objectMap.put("error", e.getMessage());
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
